@@ -1,0 +1,6 @@
+# save as .env
+DB_HOST=fill_me_in
+DB_PORT=fill_me_in
+DB_NAME=fill_me_in
+DB_USER=fill_me_in
+DB_PASSWORD=fill_me_in
