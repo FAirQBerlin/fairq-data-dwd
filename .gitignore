@@ -1,2 +1,5 @@
 /.idea/
 /.env
+.vscode/*
+fairq_data_dwd/__pycache__/*
+fairq_data_dwd/tests/__pycache__/*

@@ -5,7 +5,7 @@ Code to extract weather data from https://brightsky.dev/ and write it to a Click
 
 ## How to get started
 - Create an .env file in the project folder, see `env_template` for the structure
-- Create database as described in https://github.com/INWT/fairq-data/tree/main/inst/db (schema fairq_raw)
+- Create database as described in https://github.com/fairqBerlin/fairq-data/tree/main/inst/db (schema fairq_raw)
 
 ## Most important files
 - `get_dwd_observations.py`: This script queries the historic dwd data since a given date until today and writes it to
