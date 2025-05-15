@@ -14,4 +14,5 @@ WORKDIR /usr/src/app
 
 COPY . ./
 
+
 RUN set -ex && pipenv install --dev --deploy --system
