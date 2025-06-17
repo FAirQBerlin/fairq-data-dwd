@@ -9,7 +9,7 @@ numpy = "==2.2.6"
 pandas = "==2.2.3"
 python-dateutil = "==2.9.0"
 python-dotenv = "*"
-requests = "==2.32.3"
+requests = "==2.32.4"
 
 [dev-packages]
 black = "==25.1.0"
