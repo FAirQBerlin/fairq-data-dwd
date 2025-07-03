@@ -53,18 +53,22 @@ def send_data_clickhouse(
             db.execute(f"truncate table {schema_name}.{table_name};")
 
     if df.shape[0] > 0:
-        with db_connect() as db:
-            logger.info("Sending data to database...")
-            db.insert_dataframe(f"INSERT INTO {schema_name}.{table_name} VALUES", df)
+        try:
+            with db_connect() as db:
+                logger.info("Sending data to database...")
+                db.insert_dataframe(f"INSERT INTO {schema_name}.{table_name} VALUES", df)
+        finally:
+            with db_connect() as db:
+                if mode == "replace":
+                    logger.info("Optimizing table to remove duplicates...")
+                    db.execute(f"Optimize table {schema_name}.{table_name} final;")
+                if materialized_view_exists(table_name, schema_name):
+                    logger.info("Optimize table processed by materialized view...")
+                    db.execute(f"Optimize table {schema_name}.{table_name}_processed final;")
 
-            if mode == "replace":
-                logger.info("Optimizing table to remove duplicates...")
-                db.execute(f"Optimize table {schema_name}.{table_name} final;")
-            if materialized_view_exists(table_name, schema_name):
-                logger.info("Optimize table processed by materialized view...")
-                db.execute(f"Optimize table {schema_name}.{table_name}_processed final;")
-
-            logger.info("Done <3")
+        logger.info("Done <3")
+    else:
+        logger.info("Dataframe empty. No data to send to database. Skipping...")
 
 
 def check_for_replacing_merge_tree(table_name: str, schema_name: str):
