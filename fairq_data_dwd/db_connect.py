@@ -22,7 +22,8 @@ def db_connect() -> Client:
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         secure=True,
-        verify=False,
+        verify=True,
+        ca_certs="certificates/INWT-IPA-CA.pem",
         settings={"use_numpy": True},
     )
 
