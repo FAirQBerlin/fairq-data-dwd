@@ -22,7 +22,7 @@ def db_connect() -> Client:
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         secure=True,
-        verify=True,
+        verify=False,
         settings={"use_numpy": True},
     )
 
