@@ -1,6 +1,10 @@
-from pytest import raises
+import pytest
 
-from fairq_data_dwd.get_dwd_data import extract_dict_from_api_output, get_grid_coordinates, get_obs_of_valid_type
+from fairq_data_dwd.get_dwd_data import (
+    extract_dict_from_api_output,
+    get_grid_coordinates,
+    get_obs_of_valid_type,
+)
 
 
 def test_get_grid_coordinates():
@@ -93,7 +97,10 @@ def test_get_obs_of_valid_type():
             {"source_id": 1, "some_var": 10.1},
             {"source_id": 99, "some_var": 3.5},
             {"source_id": 7, "some_var": 4.0},
-            {"source_id": 15, "some_var": 1.1},  # source ID not defined in sources; should never happen but who knows
+            {
+                "source_id": 15,
+                "some_var": 1.1,
+            },  # source ID not defined in sources; should never happen but who knows
         ],
         "sources": [
             {"id": 1, "observation_type": "forecast"},
@@ -104,7 +111,10 @@ def test_get_obs_of_valid_type():
     }
 
     expected_forecast = [{"source_id": 1, "some_var": 10.1}]
-    expected_obs = [{"source_id": 99, "some_var": 3.5}, {"source_id": 7, "some_var": 4.0}]
+    expected_obs = [
+        {"source_id": 99, "some_var": 3.5},
+        {"source_id": 7, "some_var": 4.0},
+    ]
 
     # act
     res_forecast = get_obs_of_valid_type("forecast", req)
@@ -116,5 +126,5 @@ def test_get_obs_of_valid_type():
 
 
 def test_get_obs_of_valid_type_error():
-    with raises(ValueError, match="Allowed observation_types are: observed, forecast"):
+    with pytest.raises(ValueError, match="observation_types must be observed or forecast"):
         get_obs_of_valid_type("something_else", {})

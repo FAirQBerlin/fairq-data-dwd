@@ -1,11 +1,20 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
-from fairq_data_dwd.date_time_utils import get_date_list, get_forecast_end_date, get_forecast_start_date, two_days_ago
+from fairq_data_dwd.date_time_utils import (
+    get_date_list,
+    get_forecast_end_date,
+    get_forecast_start_date,
+    two_days_ago,
+)
 
 
 def test_get_date_list():
     # arrange
-    start_end_date_list = [("2022-01-01", "2022-05-01"), ("2021-05-01", "2022-05-20"), ("2020-02-06", "2022-05-20")]
+    start_end_date_list = [
+        ("2022-01-01", "2022-05-01"),
+        ("2021-05-01", "2022-05-20"),
+        ("2020-02-06", "2022-05-20"),
+    ]
 
     # act
     res_list = [get_date_list(start_end_dates[0], start_end_dates[1]) for start_end_dates in start_end_date_list]
@@ -30,7 +39,8 @@ def test_get_forecast_end_date():
     # assert
     assert len(res) == 16
     assert res.startswith("20")
-    assert datetime.strptime(res, "%Y-%m-%dT%H:%M") > datetime.now()
+    # parsed string yields naive datetime; attach UTC tzinfo for comparison
+    assert datetime.strptime(res, "%Y-%m-%dT%H:%M").replace(tzinfo=UTC) > datetime.now(UTC)
 
 
 def test_get_forecast_start_date():
@@ -40,7 +50,7 @@ def test_get_forecast_start_date():
     # assert
     assert len(res) == 16
     assert res.startswith("20")
-    assert datetime.strptime(res, "%Y-%m-%dT%H:%M") < datetime.now()
+    assert datetime.strptime(res, "%Y-%m-%dT%H:%M").replace(tzinfo=UTC) < datetime.now(UTC)
 
 
 def test_two_days_ago():

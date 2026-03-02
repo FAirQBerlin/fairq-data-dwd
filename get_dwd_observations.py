@@ -4,11 +4,18 @@ Default is the last 2 days to make sure that we don't have any gaps if the proce
 This script is not used in any scheduled job anymore.
 """
 
+import sys
+
 import pandas as pd
+from loguru import logger
 
 from fairq_data_dwd.date_time_utils import get_date_list, two_days_ago
 from fairq_data_dwd.db_connect import send_data_clickhouse
 from fairq_data_dwd.get_dwd_data import get_grid_coordinates, retrieve_data_from_api
+
+# Set up logging (info --> sstdout)
+logger.remove()
+logger.add(sys.stdout, level="INFO")
 
 coordinates_list = get_grid_coordinates()
 dates_list = get_date_list(start_date=two_days_ago())  # Change start_date to retrieve a specific time frame
@@ -19,5 +26,5 @@ for dates in dates_list:
     df_list.append(date_df)
 
 df_for_db = pd.concat(df_list)
-print(f"Sending data for period: {dates} to clickhouse.")
+logger.info(f"Sending data for period: {dates_list[0][0]} until {dates_list[-1][1]} to clickhouse.")
 send_data_clickhouse(df_for_db, schema_name="fairq_raw", table_name="dwd_observations")

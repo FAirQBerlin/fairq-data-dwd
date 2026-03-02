@@ -6,11 +6,21 @@ because we won't know the actual weather values when making our forecasts.
 This script is used in a kubernetes job.
 """
 
+import sys
 from datetime import datetime, timezone
 
-from fairq_data_dwd.date_time_utils import get_forecast_end_date, get_forecast_start_date
+from loguru import logger
+
+from fairq_data_dwd.date_time_utils import (
+    get_forecast_end_date,
+    get_forecast_start_date,
+)
 from fairq_data_dwd.db_connect import send_data_clickhouse
 from fairq_data_dwd.get_dwd_data import get_grid_coordinates, retrieve_data_from_api
+
+# Set up logging (info --> sstdout)
+logger.remove()
+logger.add(sys.stdout, level="INFO")
 
 coordinates_list = get_grid_coordinates()
 end_date = get_forecast_end_date()
@@ -20,5 +30,5 @@ df_for_db = retrieve_data_from_api(coordinates_list, start_date, end_date, "fore
 date_time_forecast = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:00:00")
 df_for_db["date_time_forecast"] = date_time_forecast
 
-print(f"Sending data for period: {start_date} until {end_date} to clickhouse.")
+logger.info(f"Sending data for period: {start_date} until {end_date} to clickhouse.")
 send_data_clickhouse(df_for_db, schema_name="fairq_raw", table_name="dwd_forecasts")

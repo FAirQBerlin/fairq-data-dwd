@@ -10,6 +10,11 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
+# custom exceptions
+class InvalidTableEngineError(Exception):
+    """Raised when a ClickHouse table does not have the expected engine."""
+
+
 def db_connect() -> Client:
     """
     Return Client object for db connection to clickhouse.
@@ -29,7 +34,10 @@ def db_connect() -> Client:
 
 
 def send_data_clickhouse(
-    df: pd.DataFrame, table_name: str, mode: str = "replace", schema_name: str = "fairq_raw"
+    df: pd.DataFrame,
+    table_name: str,
+    mode: str = "replace",
+    schema_name: str = "fairq_raw",
 ) -> None:
     """
     Send data of a given df to clickhouse.
@@ -42,7 +50,8 @@ def send_data_clickhouse(
     :param table_name: name of db table
     """
     if mode not in ["insert", "replace", "truncate"]:
-        raise ValueError("Allowed modes are: insert, replace, truncate")
+        msg = "Allowed modes are: insert, replace, truncate"
+        raise ValueError(msg)
 
     if mode == "replace":
         check_for_replacing_merge_tree(table_name, schema_name)
@@ -84,10 +93,8 @@ def check_for_replacing_merge_tree(table_name: str, schema_name: str):
             f"SELECT engine FROM system.tables where database = '{schema_name}' and name = '{table_name}';"
         )[0][0]
     if table_engine != "ReplacingMergeTree":
-        raise Exception(
-            f"Can't use mode 'replace' for table {table_name} since as table engine is not \
-                        + ReplacingMergeTree."
-        )
+        err_msg = f"Can't use mode 'replace' for table {table_name} since as table engine is not + ReplacingMergeTree."
+        raise InvalidTableEngineError(err_msg)
 
 
 def check_for_duplicates(table_name: str, schema_name: str, df: pd.DataFrame):

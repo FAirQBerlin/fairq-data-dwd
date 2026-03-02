@@ -1,11 +1,22 @@
+import sys
+
 import numpy as np
 import pandas as pd
 import requests
 from dateutil import parser
+from loguru import logger
+
+# Set up logging (info --> sstdout)
+logger.remove()
+logger.add(sys.stdout, level="INFO")
 
 
 def get_grid_coordinates(
-    lat_min: float = 52.3, lat_max: float = 52.7, lon_min: float = 13.0, lon_max: float = 13.8, step_size: float = 0.05
+    lat_min: float = 52.3,
+    lat_max: float = 52.7,
+    lon_min: float = 13.0,
+    lon_max: float = 13.8,
+    step_size: float = 0.05,
 ) -> list:
     """
     Get list of coordinates from rectangle grid. The grid is defined by the min and max longitude and latitude values.
@@ -18,10 +29,13 @@ def get_grid_coordinates(
     :param step_size: defines the distance between coordinates, default is 0.05 degrees (~ 5 km)
     :return: list of coordinates from rectangle grid in format [(lat, lon), ...]
     """
-    berlin_grid_coordinates = []
-    for x in np.arange(lat_min, lat_max, step_size):
-        for y in np.arange(lon_min, lon_max, step_size):
-            berlin_grid_coordinates.append((round(x, 2), round(y, 2)))
+    berlin_grid_coordinates: list[tuple[float, float]] = []
+    # build coordinate pairs using comprehension and extend for performance
+    berlin_grid_coordinates.extend(
+        (float(round(x, 2)), float(round(y, 2)))
+        for x in np.arange(lat_min, lat_max, step_size).astype(float)
+        for y in np.arange(lon_min, lon_max, step_size).astype(float)
+    )
     return berlin_grid_coordinates
 
 
@@ -62,11 +76,12 @@ def retrieve_data_from_api(
     :return: pd.Dataframe containing dwd data for given coordinates and time period
     """
     dict_list = []
-    print(f"Retrieving data for period: {start_date} until {end_date}")
+    logger.info(f"Retrieving data for period: {start_date} until {end_date}")
     for coordinates in coordinates_list:
         r = requests.get(
             f"https://api.brightsky.dev/weather?date={start_date}&last_date={end_date}&lat={coordinates[0]}\
-            + &lon={coordinates[1]}"
+            + &lon={coordinates[1]}",
+            timeout=30,
         )
         req = r.json()
         valid_weather_entries = get_obs_of_valid_type(observation_type, req)
@@ -89,7 +104,8 @@ def get_obs_of_valid_type(observation_type: str, api_response) -> list:
     elif observation_type == "forecast":
         allowed_types = [observation_type]
     else:
-        raise ValueError("Allowed observation_types are: observed, forecast")
+        err_msg = "observation_types must be observed or forecast"
+        raise ValueError(err_msg)
 
     # Get the API-internal ID of the observation_type we want to extract
     valid_source_ids = [
