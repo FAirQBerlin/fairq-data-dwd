@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "fairq-data-dwd"
-version = "2026.02.14"
+version = "2026.08.0"
 description = "Code to extract weather data from https://brightsky.dev/ and write it to a Clickhouse database"
 authors = ["INWT Statistics GmbH <fairq@inwt-statistics.de>"]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-clickhouse-driver = "0.2.10"
+clickhouse-driver = "0.2.11"
 numpy = "2.2.6"
 pandas = "2.3.3"
 python-dateutil = "2.9.0.post0"
@@ -21,7 +21,7 @@ mypy = "*"
 pytest = "*"
 
 [tool.bumpver]
-current_version = "2026.02.14"
+current_version = "2026.08.0"
 version_pattern = "YYYY.0M.PATCH"
 commit_message = "bump version to {old_version} -> {new_version}"
 tag_message = "v{new_version}"
@@ -45,7 +45,10 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["ANN", "COM812", "D", "ISC001", "RET504", "S608", "DTZ007"]
+ignore = [
+          "ANN", "COM812", "D", "ISC001", "RET504", "S608", "DTZ007",
+          "CPY001", # Copyright-Header-Prüfung deaktivieren         
+          ]
 
 [tool.ruff]
 line-length = 120
