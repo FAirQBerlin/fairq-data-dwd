@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fairq-data-dwd"
-version = "2026.09.0"
+version = "2026.09.1"
 description = "Code to extract weather data from https://brightsky.dev/ and write it to a Clickhouse database"
 authors = ["INWT Statistics GmbH <fairq@inwt-statistics.de>"]
 
@@ -21,7 +21,7 @@ mypy = "*"
 pytest = "*"
 
 [tool.bumpver]
-current_version = "2026.09.0"
+current_version = "2026.09.1"
 version_pattern = "YYYY.0M.PATCH"
 commit_message = "bump version to {old_version} -> {new_version}"
 tag_message = "v{new_version}"
